@@ -11,11 +11,48 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+			
+			
+			#title{
+				position:fixed;
+				color:#fff;	
+				font-family:"GeoSans";
+				left:10px;
+			}
+			
+			#title a{
+				text-decoration:underline;
+				color:#fff;	
+				font-family:"GeoSans"
+			}
+			
+			@font-face {
+ 				font-family: "GeoSans";
+  				src: url("../../allSiteLib/GeosansLight.ttf");
+			}
 		</style>
  	
     </head>
 <body>
 
+
+<div id="title">
+<h1>Vladislav Delay - Vastaa</h1>
+ <a href="http://www.vladislavdelay.com/site/" target="_blank">Vladislav Delay Site</a><br/><br/>
+ 
+    <h2>Other Visuals</h2>
+    <a href="dublabCC10.html">Dublab - Creative Commons 10th B-Day Mix</a><br/>
+    <a href="analyser.html">Teebs - Double Fifths</a><br/>
+    <a href="analyser2.html">Flako - Hole in the Dark</a><br/>
+    <a href="analyserPNO.html">Pink Noise Ordinance</a><br/>
+    
+    
+    <br/>
+    
+    Check out the project on <a href="https://github.com/cabbibo/AudioJS" target="_blank">Github</a><br/><br/>
+    Press 'x' to hide info and cursor
+
+</div>
 
 <script src="../../allSiteLib/three.js"></script>
 <script src="../../allSiteLib/jquery-1.7.1.min.js"></script>
@@ -23,6 +60,26 @@
 <script src="js/music/BufferLoader.js"></script>
 	
     <script>
+	
+	
+	var infoShown=true;
+	$(document).keypress(function(event){
+		
+		if(String.fromCharCode(event.which)=='x'){
+			
+			if(infoShown==true){
+				$("#title").toggle();
+				$("#controls").toggle();
+				$("html").css("cursor","none");
+				infoShown=false
+			}else{
+				$("#controls").toggle();
+				$("#title").toggle();
+				$("html").css("cursor","default");
+				infoShow=true;
+			}
+		}
+ 	})
 		var score=0;
 	
 	

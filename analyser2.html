@@ -11,11 +11,49 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+			
+			
+			#title{
+				position:fixed;
+				color:#fff;	
+				left:10px;
+				font-family:"GeoSans";
+				
+			}
+			
+			#title a{
+				text-decoration:underline;
+				color:#fff;	
+				font-family:"GeoSans"
+			}
+			
+			@font-face {
+ 				font-family: "GeoSans";
+  				src: url("../../allSiteLib/GeosansLight.ttf");
+			}
 		</style>
  	
     </head>
 <body>
 
+<div id="title">
+<h1>Flako - Hole in the Dark</h1>
+ <a href="https://soundcloud.com/flako" target="_blank">Soundcloud</a><br/>
+ <a href="http://thehitandrun.bandcamp.com/album/road-kill-vol-3" target="_blank"> Road Kill Vol. 3</a><br/><br/>
+ 
+    <h2>Other Visuals</h2>
+    <a href="dublabCC10.html">Dublab - Creative Commons 10th B-Day Mix</a><br/>
+    <a href="analyser.html">Teebs - Double Fifths</a><br/>
+    <a href="analyser3.html">Vladislav Delay - Vastaa </a><br/>
+    <a href="analyserPNO.html">Pink Noise Ordinance</a><br/>
+    
+    
+    <br/>
+    
+    Check out the project on <a href="https://github.com/cabbibo/AudioJS" target="_blank">Github</a><br/><br/>
+    Press 'x' to hide info and cursor
+
+</div>
 
 <script src="../../allSiteLib/three.js"></script>
 <script src="../../allSiteLib/jquery-1.7.1.min.js"></script>
@@ -23,6 +61,26 @@
 <script src="js/music/BufferLoader.js"></script>
 	
     <script>
+	
+	
+	var infoShown=true;
+	$(document).keypress(function(event){
+		
+		if(String.fromCharCode(event.which)=='x'){
+			
+			if(infoShown==true){
+				$("#title").toggle();
+				$("#controls").toggle();
+				$("html").css("cursor","none");
+				infoShown=false
+			}else{
+				$("#controls").toggle();
+				$("#title").toggle();
+				$("html").css("cursor","default");
+				infoShow=true;
+			}
+		}
+ 	})
 		var score=0;
 	
 	

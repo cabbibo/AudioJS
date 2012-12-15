@@ -1,4 +1,19 @@
+<!-- READ ME
 
+This is still a work in progress, as I attempt to make some functional music scripts
+
+If you are interested in joining in on the project, please email me at contact@cabbibo.com
+
+Check out Three.js! 
+
+
+
+
+Creative Commons - Share Alike 
+
+
+
+-->
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
@@ -12,14 +27,13 @@
 				overflow: hidden;
 			}
 			
-			#controls{
-				margin-right:-260px;
-			}
+			
 			
 			#title{
 				position:fixed;
 				color:#fff;	
-				font-family:"GeoSans"
+				font-family:"GeoSans";
+				left:10px;
 			}
 			
 			#title a{
@@ -37,11 +51,23 @@
     </head>
 <body>
 <div id="title">
-Happy Birthday Creative Commons!<br/>
+<h1>Happy Birthday Creative Commons!</h1>
 Creative Commons 10th Anniversary Mix by <a href="http://dublab.com/" target="_blank"> Dublab</a><br/>
 Check out a video they did for the mix 
-<a href="http://dublab.com/cc10-dublabs-creative-commons-10th-anniversary-video-mix/" target="_blank">here</a><br/>
-
+<a href="http://dublab.com/cc10-dublabs-creative-commons-10th-anniversary-video-mix/" target="_blank">here</a><br/><br/>
+ 
+    <h2>Other Visuals</h2>
+   
+    <a href="analyser.html">Teebs - Double Fifths</a><br/>
+    <a href="analyser2.html">Flako - Hole in the Dark</a><br/>
+    <a href="analyser3.html">Vladislav Delay - Vastaa </a><br/>
+    <a href="analyserPNO.html">Pink Noise Ordinance</a><br/>
+    
+    
+    <br/>
+    
+    Check out the project on <a href="https://github.com/cabbibo/AudioJS" target="_blank">Github</a><br/><br/>
+    Press 'x' to hide info and cursor
 
 </div>
 
@@ -51,6 +77,25 @@ Check out a video they did for the mix
 <script src="js/music/BufferLoader.js"></script>
 	
     <script>
+	
+	var infoShown=true;
+	$(document).keypress(function(event){
+		
+		if(String.fromCharCode(event.which)=='x'){
+			
+			if(infoShown==true){
+				$("#title").toggle();
+				$("#controls").toggle();
+				$("html").css("cursor","none");
+				infoShown=false
+			}else{
+				$("#controls").toggle();
+				$("#title").toggle();
+				$("html").css("cursor","default");
+				infoShow=true;
+			}
+		}
+ 	})
 		var score=0;
 	
 	
