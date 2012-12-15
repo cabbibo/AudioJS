@@ -1,0 +1,395 @@
+
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>Pink Noise Ordinance</title>
+		<meta charset="utf-8">
+ 
+		<style type="text/css">
+			body {
+				background:black;
+				margin: 0px;
+				overflow: hidden;
+			}
+			
+		
+			
+		
+		</style>
+ 	
+    </head>
+<body>
+
+
+<script src="../../allSiteLib/three.js"></script>
+<script src="../../allSiteLib/jquery-1.7.1.min.js"></script>
+<script src="js/music/songCreator.js"></script>
+<script src="js/music/BufferLoader.js"></script>
+	
+    <script>
+		var score=0;
+	
+		//var music=new MUSIC("../starFieldAudio/top",7);
+		files=["analyserMusic/PNO/0.mp3"]
+		var looped=new MUSIC(files,"stream");
+		
+		looped.visualize=function(freqData,binCount,n){
+			// fconsole.log(scene.children[i])
+			for(var i=1;i<=particleFields;i++){
+				if(n==i){
+					//console.log(n)
+					if(freqData!=0){
+						//scene.children[i].scale.x=(freqData)/1000
+						//console.log(freqData)
+						scene.children[i].material.size=(freqData)/visualizer.size
+						scene.children[i].scale.x=1+(freqData/visualizer.scaleY)
+						scene.children[i].scale.y=1+(freqData/visualizer.scaleY)
+					}else{
+						//console.log(freqData)
+						scene.children[i].material.size=5
+						
+					}
+				}
+			}
+		}
+		
+		$(looped.audio).bind('play', function(){
+				if(level.visualStarted==false){
+					looped.play(0,{id:'ID',looped:true,visualized:true});
+					level.visualStarted=true;
+				}
+		});
+		
+	
+		$(looped.audio).bind('ended', function(){
+				// done playing
+				
+				zoom.minSpeed=.1
+				zoom.deccel=.03
+				//alert("Player stopped");
+		});
+		
+		/*
+		looped.onLoaded= function(){
+			looped.play(0,{id:'ID',looped:true,visualized:true});	
+		}*/
+	
+	
+		
+		
+		
+		 
+		//Colors that will randomly get picked from
+		var colors=[0x1047a9,0x29477f,0x4577D4,0x6b90d4,0x6549d7,0x846fd7,0xffcf40,0xffdc73],
+		
+		crossAngle=0,
+		zoom={
+				speed:30,
+				maxSpeed:800,
+				minSpeed:30,
+				accel:0.001,
+				deccel:0.001,
+				xZoom:function(){
+					var toReturn=-(mouseX-window.innerWidth/2)/80
+					return (toReturn)
+				},
+				yZoom:function(){
+					var toReturn=(mouseY-window.innerHeight/2)/80
+					return (toReturn)
+				},
+		}
+		
+		
+		var level={
+			beat:8,
+			accuracy:500,
+			visualStarted:false
+		}
+		
+		var particleParams={
+			width:1000,
+			height:1000,
+			depth:20,
+			numberOfParticles:1000,
+			particleSize:1,
+			size:10
+			
+		}
+		
+		var visualizer={
+			scaleX:30,
+			scaleY:30,	
+			size:3,
+			amountOfSpectrum:.2,
+			partOfSpectrum:0,
+			getSat:function(data){
+				var newSat=(data*3)/1000
+				return (newSat)
+			},
+			getVal:function(data){
+				var newVal=(data*30)/10000
+				return (newVal)
+			},
+			
+			
+			
+			getHue:function(i){
+				var newHue=i*visualizer.amountOfSpectrum/(particleParams.fields)+visualizer.partOfSpectrum+time
+				
+				function lessThan1(){
+					if(newHue>=1){
+						newHue-=1
+						lessThan1();
+						
+							
+					}
+				}
+				lessThan1();
+				return newHue
+			},
+			//rget
+			
+		}
+		
+		
+		
+		
+		
+		particleFields=200;
+		
+	
+		//main three objects
+		var camera, scene, renderer, 
+		
+		//mouse
+		mouseX=0,mouseY=0,mouseDown=false,
+		
+		
+		//Array in which to store particles
+		particles=[];
+		
+		
+		init();
+		
+		
+		function init(){
+
+			
+			//Field of view (degrees),aspect ratio for render output, near and far clipping plane
+			camera = new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,4000)
+			
+			//default Z is zero
+			camera.position.z =1000;	
+			
+			//Contains all of hte 3d object data
+			scene = new THREE.Scene();
+			scene.fog = new THREE.FogExp2( 0x000000, 0.0004 );
+			scene.add(camera);
+			
+			//Add your own renderer, webgl or canvas
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			
+			// the renderer's canvas domElement is added to the body
+			document.body.appendChild(renderer.domElement );
+			
+			
+			
+			
+			makeParticles(); 
+ 
+			// add the mouse move listener
+			document.addEventListener( 'mousemove', onMouseMove, false );
+			// add the mouse move listener
+			document.addEventListener( 'mousedown', onMouseDown, false );
+			document.addEventListener( 'mouseup', onMouseUp, false );
+ 
+			
+			
+			
+			// render 30 times a second (should also look 
+			// at requestAnimationFrame) 
+			//setInterval(update, 1000/30);
+			
+			function animate() {
+				requestAnimationFrame( animate );
+				update();
+				//stats.update();
+	
+			}
+			animate();
+		
+		
+			// the main update function, called 30 times a second
+ 
+			function update(){
+ 
+				updateParticles();
+ 				crossAngle++;
+				// and render the scene from the perspective of the camera
+				renderer.render( scene, camera );
+ 
+			}
+			
+	
+			function makeParticles() { 
+ 
+			var particle, material; 
+		 	var geometry = new THREE.Geometry();
+
+				for ( i = 0; i < particleParams.numberOfParticles; i ++ ) {
+
+					var vertex = new THREE.Vector3();
+					vertex.x = Math.random() * particleParams.width - particleParams.width/2;
+					vertex.y = Math.random() *  particleParams.height - particleParams.height/2;
+					vertex.z = Math.random() * particleParams.depth - particleParams.depth/2;
+
+					geometry.vertices.push( vertex );
+
+				}
+				
+				
+				// we're gonna move from z position -1000 (far away) 
+				// to 1000 (where the camera is) and add a random particle at every pos. 
+				for ( var i=0; i < particleFields; i++ ) {
+			 	
+					var choosenColor
+					function chooseColor(){
+							//console.log(level.beat)
+						if(i%level.beat==1){
+							//console.log("offColor")
+							coshenColor=0xffffff
+							
+						}else{
+							//console.log("ALLCOLOR")
+
+							
+							
+							chosenColor=(i/particleFields*0xffffff)
+						}
+						
+					}
+					
+				
+					sprite1 = THREE.ImageUtils.loadTexture( "img/briSprite.png" );
+					
+					
+					material = new THREE.ParticleBasicMaterial( {size:particleParams.size,map:sprite1, blending: THREE.AdditiveBlending, depthTest: false, transparent : true
+					 } );
+					
+				
+					// make the particle
+			 		particles = new THREE.ParticleSystem( geometry, material );
+					particles.position.z = (-i*8000/particleFields)-2000
+					
+					particles.rotation.x = 0;
+					particles.rotation.y = 0;
+					particles.rotation.z = 0;
+			 
+					// add it to the scene
+					scene.add( particles );
+			 
+					
+					
+					
+				}
+				
+				//console.log("SCEBE")
+				//console.log(scene.children[1])
+
+			}
+			
+			function updateParticles(){
+				if(level.visualStarted==true){
+					for(var i=1;i<=particleFields;i++){
+						scene.children[i].rotation.z+=(i*.00001)
+						if (mouseDown){
+							if(zoom.speed <= zoom.maxSpeed){
+								zoom.speed += zoom.accel	
+							}
+						}else{
+							if (zoom.speed >= zoom.minSpeed){
+								zoom.speed-=zoom.deccel
+							}
+						}
+						
+						
+						scene.children[i].position.x+=zoom.xZoom()
+						scene.children[i].position.y+=zoom.yZoom()
+						scene.children[i].position.z+=zoom.speed
+						if(scene.children[i].position.z>=2000){
+							scene.children[i].position.z-=8000
+							
+							//console.log(scene.children[i])
+		
+							/*if(i%level.beat==8){
+								
+								var randNote= Math.floor(Math.random()*musicB.numberOf)
+								music.play(1);
+							}
+							
+							if(i%level.beat==4){
+								
+								
+								music.play(2);
+							}
+							if(i%level.beat==2){
+								
+								music.play(6);
+							}
+							if(i%level.beat==4){
+								
+								music.play(4);
+							}*/
+						
+						}
+						
+	
+					}
+				}
+			}
+			
+		}
+		
+		
+		// called when the mouse moves
+			function onMouseMove( event ) {
+				// store the mouseX and mouseY position 
+				mouseX = event.clientX;
+				mouseY = event.clientY;
+			}
+			function onMouseDown( event ) {
+				// store the mouseX and mouseY position 
+				mouseDown=true;
+				
+				//if(looped.isLoaded==true){looped.playLooped(0);}
+			
+				//musicT.play(0);
+				
+				//console.log(music2)
+				//music.playLooped(1)
+			}
+			
+			function onMouseUp( event ) {
+				// store the mouseX and mouseY position 
+				mouseDown=false
+			}
+	
+			function getRandColor(){
+				var theNum = Math.floor(Math.random()*colors.length)
+	
+				var theColor = colors[theNum]
+			
+				return theColor;
+				
+					
+			}
+			
+		
+	
+	
+	</script>
+
+
+</body>
+</html>

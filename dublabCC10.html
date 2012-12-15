@@ -1,0 +1,450 @@
+
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>Dublab - Creative Commons 10th Anniversary Mix </title>
+		<meta charset="utf-8">
+ 
+		<style type="text/css">
+			body {
+				background:black;
+				margin: 0px;
+				overflow: hidden;
+			}
+			
+			#controls{
+				margin-right:-260px;
+			}
+			
+			#title{
+				position:fixed;
+				color:#fff;	
+				font-family:"GeoSans"
+			}
+			
+			#title a{
+				text-decoration:underline;
+				color:#fff;	
+				font-family:"GeoSans"
+			}
+			
+			@font-face {
+ 				font-family: "GeoSans";
+  				src: url("../../allSiteLib/GeosansLight.ttf");
+			}
+		</style>
+ 	
+    </head>
+<body>
+<div id="title">
+Happy Birthday Creative Commons!<br/>
+Creative Commons 10th Anniversary Mix by <a href="http://dublab.com/" target="_blank"> Dublab</a><br/>
+Check out a video they did for the mix 
+<a href="http://dublab.com/cc10-dublabs-creative-commons-10th-anniversary-video-mix/" target="_blank">here</a><br/>
+
+
+</div>
+
+<script src="../../allSiteLib/three.js"></script>
+<script src="../../allSiteLib/jquery-1.7.1.min.js"></script>
+<script src="js/music/songCreator.js"></script>
+<script src="js/music/BufferLoader.js"></script>
+	
+    <script>
+		var score=0;
+	
+	
+		var clock = new THREE.Clock();
+	
+		//var music=new MUSIC("../starFieldAudio/top",7);
+		files=["analyserMusic/dublabCC10.mp3"]
+		var looped=new MUSIC(files,"stream");
+		
+		looped.visualize=function(freqData,binCount,n){
+			// fconsole.log(scene.children[i])
+			for(var i=1;i<=particleParams.fields;i++){
+				var whichFreq = (i*512)/particleParams.fields
+				
+				if(n==i){
+					//console.log(n)
+					if(freqData!=0){
+						//scene.children[i].scale.x=(freqData)/1000
+						scene.children[i].material.size=(freqData)/visualizer.size
+						//scene.children[i].scale.x=1+(freqData/visualizer.scaleX)
+						//scene.children[i].scale.y=1+(freqData/visualizer.scaleY)
+						//scene.children[i].material.color.setRGB( 60, 80, 80 );
+						scene.children[i].material.color.setHSV(
+						visualizer.getHue(i),
+						visualizer.getSat(freqData), 
+						visualizer.getVal(freqData) );
+						
+					}else{
+						scene.children[i].material.size=50
+						scene.children[i].material.color.setHSV(
+						visualizer.getHue(i),
+						visualizer.getSat(100), 
+						visualizer.getVal(50) );
+					}
+				}
+			}
+		}
+		
+		
+		$(looped.audio).bind('play', function(){
+				// done playing
+				if(level.visualStarted==false){
+					looped.play(0,{id:'ID',looped:true,visualized:true});
+					level.visualStarted=true;
+				}
+				
+		});
+		
+	
+		$(looped.audio).bind('ended', function(){
+				// done playing
+				
+				zoom.minSpeed=.1
+				zoom.deccel=.03
+				//alert("Player stopped");
+		});
+		
+		
+		//music.onLoaded= function(){
+		//	music.playAll();	
+		//}
+	
+	
+		
+		
+		
+		 
+		//Colors that will randomly get picked from
+		var colors=[0x1047a9,0x29477f,0x4577D4,0x6b90d4,0x6549d7,0x846fd7,0xffcf40,0xffdc73],
+		
+		crossAngle=0,
+		zoom={
+				speed:1,
+				maxSpeed:500,
+				minSpeed:1,
+				accel:0.002,
+				deccel:0.005,
+				xZoom:function(){
+					var toReturn=-(mouseX-window.innerWidth/2)/200
+					return (toReturn)
+				},
+				yZoom:function(){
+					var toReturn=(mouseY-window.innerHeight/2)/200
+					return (toReturn)
+				},
+		}
+		
+		
+		var level={
+			beat:8,
+			accuracy:500,
+			visualStarted:false
+		}
+		
+		var particleParams={
+			width:10,
+			height:10,
+			depth:80,
+			numberOfParticles:100,
+			size:20,
+			fields:200
+		}
+		
+		var visualizer={
+			scaleX:1000,
+			scaleY:1000,	
+			size:2,
+			amountOfSpectrum:.2,
+			partOfSpectrum:0,
+			getSat:function(data){
+				var newSat=(data*3)/1000
+				return (newSat)
+			},
+			getVal:function(data){
+				var newVal=(data*30)/10000
+				return (newVal)
+			},
+			
+			
+			
+			getHue:function(i){
+				var newHue=i*visualizer.amountOfSpectrum/(particleParams.fields)+visualizer.partOfSpectrum+time
+				
+				function lessThan1(){
+					if(newHue>=1){
+						newHue-=1
+						lessThan1();
+						
+							
+					}
+				}
+				lessThan1();
+				return newHue
+			},
+			//rget
+			
+		}
+		
+		
+		//particleParams.fields=200;
+		
+	
+		//main three objects
+		var camera, scene, renderer,time=Date.now(),startTime=Date.now(),
+		
+		//mouse
+		mouseX=0,mouseY=0,mouseDown=false,
+		
+		
+		//Array in which to store particles
+		particles=[];
+		
+		
+		init();
+		
+		function init(){
+			
+			
+			//Field of view (degrees),aspect ratio for render output, near and far clipping plane
+			camera = new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,4000)
+			
+			//default Z is zero
+			camera.position.z =1000;	
+			
+			
+			controls = new THREE.RollControls( camera );
+
+			controls.movementSpeed = 1000;
+			controls.lookSpeed = 3;
+			controls.constrainVertical = [ -0.5, 0.5 ];
+			
+			
+			//Contains all of hte 3d object data
+			scene = new THREE.Scene();
+			scene.fog = new THREE.FogExp2( 0x000000, 0.0004 );
+			scene.add(camera);
+			
+			
+			//var light = new THREE.PointLight(0xffffff,.1,0);
+			//scene.add( light );
+				
+			//Add your own renderer, webgl or canvas
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			
+			// the renderer's canvas domElement is added to the body
+			document.body.appendChild(renderer.domElement );
+			
+			
+			
+			
+			makeParticles(); 
+ 
+			// add the mouse move listener
+			document.addEventListener( 'mousemove', onMouseMove, false );
+			// add the mouse move listener
+			document.addEventListener( 'mousedown', onMouseDown, false );
+			document.addEventListener( 'mouseup', onMouseUp, false );
+ 
+			
+			
+			
+			// render 30 times a second (should also look 
+			// at requestAnimationFrame) 
+			//setInterval(update, 1000/30);
+			
+			function animate() {
+				requestAnimationFrame( animate );
+				update();
+				//controls.update();
+				controls.update( clock.getDelta() );
+	
+			}
+			animate();
+		
+		
+			// the main update function, called 30 times a second
+ 
+			function update(){
+ 				time = (Date.now()-startTime) * 0.00005;
+				//console.log(time)
+				updateParticles();
+				
+				
+ 				crossAngle++;
+				// and render the scene from the perspective of the camera
+				renderer.render( scene, camera );
+ 
+			}
+			
+	
+			function makeParticles() { 
+ 
+			var particle, material; 
+		 	var geometry = new THREE.Geometry();
+
+				for ( i = 0; i < particleParams.numberOfParticles; i ++ ) {
+
+					var vertex = new THREE.Vector3();
+					partPos =  getPartPos(i, particleParams.numberOfParticles);
+					
+					vertex.x = 	partPos.x 
+					vertex.y = 	partPos.y
+					vertex.z = 	partPos.z
+
+					geometry.vertices.push( vertex );
+
+				}
+				
+				
+				// we're gonna move from z position -1000 (far away) 
+				// to 1000 (where the camera is) and add a random particle at every pos. 
+				for ( var i=0; i < particleParams.fields; i++ ) {
+			 						var choosenColor
+					function chooseColor(){
+							//console.log(level.beat)
+						if(i%level.beat==5){
+							//console.log("offColor")
+							//coshenColor=0xffffff
+							
+						}else{
+							//console.log("ALLCOLOR")
+
+							
+							
+							chosenColor=(Math.abs(i-(particleParams.fields/2))*0x00f0f0)
+						}
+						
+					}
+					chooseColor();
+					
+					sprite1 = THREE.ImageUtils.loadTexture( "img/dublabCC10/dublab.png" );
+					sprite2 = THREE.ImageUtils.loadTexture( "img/dublabCC10/10.png" );
+					sprite3 = THREE.ImageUtils.loadTexture( "img/dublabCC10/cake.png" );
+					sprite4 = THREE.ImageUtils.loadTexture( "img/dublabCC10/cc.png" );
+					
+					sprites=[sprite1,sprite2,sprite3,sprite4]
+					
+					function getRandomSprite(){
+							var sprite2Return = sprites[Math.floor(Math.random()*sprites.length)]
+							return sprite2Return
+					}
+					
+					
+				
+					
+					material = new THREE.ParticleBasicMaterial( {
+						size:particleParams.size,
+						map:getRandomSprite(), 
+						blending: THREE.AdditiveBlending, 
+						depthTest: false, 
+						transparent : true
+					 } );
+					
+					//material.color.setHSV(10, 1.0, 1.0 );
+					// make the particle
+			 		particles = new THREE.ParticleSystem( geometry, material );
+					
+					
+					var fieldPos = getFieldPos(i,particleParams.fields)
+					particles.position.x = fieldPos.x;
+					particles.rotation.y = fieldPos.y;
+					particles.position.z = fieldPos.z;
+					particles.rotation.z = i;
+			 
+					// add it to the scene
+					scene.add( particles );
+			 
+					
+					
+					
+				}
+				
+				console.log("SCEBE")
+				console.log(scene.children[1])
+				
+			}
+			
+			function updateParticles(){
+				
+				for(var i=1;i<=particleParams.fields;i++){
+					scene.children[i].rotation.z+=((i-(particleParams.fields/2))*.000005)
+					scene.children[i].rotation.x+=(((particleParams.fields/2)-i)*.000005)
+					scene.children[i].rotation.y+=(((particleParams.fields/2)-i)*.00001)
+					
+					//scene.children[i].scale.x+=(i*.0005)
+				
+					if(scene.children[i].position.z>=2000){
+						scene.children[i].position.z-=8000
+					}
+					
+
+				}
+				
+			}
+			
+		}
+		
+		
+		// called when the mouse moves
+			function onMouseMove( event ) {
+				// store the mouseX and mouseY position 
+				mouseX = event.clientX;
+				mouseY = event.clientY;
+			}
+			function onMouseDown( event ) {
+				// store the mouseX and mouseY position 
+				mouseDown=true;
+				
+				//if(looped.isLoaded==true){looped.playLooped(0);}
+			
+				//musicT.play(0);
+				
+				//console.log(music2)
+				//music.playLooped(1)
+			}
+			
+			function onMouseUp( event ) {
+				// store the mouseX and mouseY position 
+				mouseDown=false
+			}
+	
+			function getRandColor(){
+				var theNum = Math.floor(Math.random()*colors.length)
+				var theColor = colors[theNum]
+				return theColor;
+				
+					
+			}
+			
+			
+			function getFieldPos(num,totalNum){
+				
+				
+				
+				
+				var fieldPos2R={ x:Math.random()*20,y:Math.random()*20,z:0}
+				return fieldPos2R
+				
+				
+			}
+			function getPartPos(num,totalNum){
+				
+				
+				
+				
+				var partPos2R={ x:num*1+Math.random()*20,y:Math.random()*2000,z:100}
+				return partPos2R
+				
+				
+			}
+	
+	</script>
+
+
+</body>
+</html>

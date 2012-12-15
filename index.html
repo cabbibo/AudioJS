@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Untitled Document</title>
+<script src="../../allSiteLib/jquery-1.7.1.min.js"></script>
+<script src="js/music/BufferLoader.js"></script>
+<script src="js/music/songCreator.js"></script>
+
+
+<script>
+	var files=[
+		"analyserMusic/looped2/0.mp3",
+		"analyserMusic/looped/0.mp3",
+	
+	]
+	var music1= new MUSIC(files,1,"loaded","gainNode","delayNode","gainNode","analyser")
+	$(document).ready(function(){
+	
+			music1.initVisual("standard")
+		
+	});
+</script>
+</head>
+
+
+
+<body>
+
+<div id="Buttons">
+		<a onclick="music1.play(0,{id:'ID',looped:false,visualized:true})">0</a>
+        <a onclick="music1.play(1,{id:'ID',looped:false,visualized:true})">1</a>
+        <a onclick="music1.play(2)">2</a>
+        <a onclick="music1.play(3,'sound3')">3</a>
+        <a onclick="music1.play(4)">4</a>
+        <a onclick="music1.play(5)">5</a>
+        <a onclick="music1.play(6)">6</a>
+        <a onclick="music1.playAll()">all</a>
+        <br/>
+        <a onclick="music1.stop()">0</a>
+        <a onclick="music1.stop()">1</a>
+        <a onclick="music2.play(2)">2</a>
+</div>
+
+
+</body>
+</html>
